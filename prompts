@@ -1,0 +1,41 @@
+Original_Prompt
+Provide total MtM for ISIN US91282CGB19 in HONG KONG country.
+For HONG KONG country, calculate difference for Bond notional, MtM and RWA between ISIN US91282CGB19 and ISIN HK000109253.
+For UK country, provide Bonds with the most negative MtM for the most recent COB date.
+Provide a list of countries where ISIN US91282CGB19 was held.
+For NIGERIA country, list FVOCI bonds notional by maturity year and month
+For NIGERIA country, provide bond notional for FVOCI grouped by maturity year and month.
+For bonds in UNITED ARAB EMIRATES country, provide notional and calculate weighted average maturity.
+For portfolio UKEHTC, calculate weighted average maturity for bonds.
+For Kenya country, calculate weighted average maturity for bonds.
+Provide notional of Fixed rate Issuances in the US country maturing in August 2025, for the most recent COB date.
+Provide weighted average holding yield of Fixed rate Issuances in US country maturing in August 2025, for the most recent COB date.
+Provide notional of Issuances in US country maturing from January 2025 to March 2025, for December 2024 COB date.
+For INDIA country, provide total amount of Bond MtM and RWA for FVOCI.
+For KENYA country, provide notional and MTM amounts for bonds.
+For UK country, provide MtM amount for Bonds.
+For UNITED KINGDOM country, provide MtM, PV01, RWA and CR Delta amounts.
+Provide notional and PV01 amounts for FVOCI portfolios for COB March 2025
+For KENYA country, provide MtM amount for Bonds.
+For GERMANY country, provide notional for the structural hedges.
+For UAE country, provide Book Value amount for COB May 2025
+For TAIWAN country, provide MtM amount for IRS.
+For TAIWAN country, provide PV01 amount for IRS.
+Provide notional and Book Value amounts for Bonds and Issuances.
+Provide RWA for UNITED KINGDOM country and group it by securities type.
+For NIGERIA country, provide Bonds notional amount and group it by currency.
+For UNITED ARAB EMIRATES country, provide notional amounts for HQLA category and group by currency and issuer name.
+What is the month on month notional change in Securities held in UNITED STATES OF AMERICA country for COB February 2025?
+For UNITED KINGDOM country, provide over the period trend for MtM, PV01, RWA and CR Delta amounts.
+For TAIWAN country, provide over the period trend for notional, PV01 and MtM.
+For UK FVOCI, calculate notional change from January 2025 to the most recent COB date.
+For Bonds and IRS in UNITED KINGDOM country, provide over the period trend of PV01 and MtM.
+For Issuances in US country, provide notional trend over the period.
+Provide weighted average holding yield for Bonds.
+For Bonds in KENYA country, calculate weighted average holding yield.
+For bonds in UNITED ARAB EMIRATES country, provide notional and calculate weighted average holding yield for COB 2025-07-15. Present results by portfolio.
+For portfolio HKALMSSA, calculate weighted average holding yield and maturity for bonds.
+Provide weighted average holding yield for bonds in portfolio UKBONDIM for COB December 2024 and 2025-07-15 and calculate the difference between them.
+For United Arab Emirates country, calculate the weighted average holding yield and maturity for bonds for COB 2025-07-15. Present results by portfolio.
+For bonds in Kenya country, calculate weighted average Market yield.
+What is the weighted average discount margin (spread) of outstanding and new Issuances in the UNITED STATES OF AMERICA as of March 2025?
