@@ -1,0 +1,104 @@
+service:
+  flush: 1
+  log_level: info
+  http_server: on
+  http_listen: 127.0.0.1
+  http_port: 2020
+
+pipeline:
+  inputs:
+    # Application logs
+    - name: tail
+      path: /app/logs/app.log
+      tag: vllm-app
+      parser: json
+
+    # vLLM Prometheus metrics
+    - name: prometheus_scrape
+      host: 127.0.0.1
+      port: 8000
+      tag: vllm-metrics
+      metrics_path: /metrics
+      scrape_interval: 10s
+
+  filters:
+    # Add metadata to application logs
+    - name: modify
+      match: vllm-app
+      add: type log
+      add: source vllm-application
+      add: environment ${ENVIRONMENT:-production}
+      add: category application
+
+    # Process metrics: Add metadata and structure for Cloud Logging
+    - name: modify
+      match: vllm-metrics
+      add: type metric
+      add: source vllm-prometheus
+      add: environment ${ENVIRONMENT:-production}
+      add: service vllm
+      add: category metrics
+
+    # Add timestamp and structure for Cloud Logging
+    - name: lua
+      match: vllm-metrics
+      script: |
+        function process_metrics(tag, timestamp, record)
+            -- Add timestamp in ISO8601 format
+            record["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z", timestamp)
+            record["metric_timestamp"] = timestamp
+            
+            -- Extract and organize vLLM metrics
+            local metrics = {}
+            for key, value in pairs(record) do
+                if string.match(key, "^vllm_") then
+                    metrics[key] = value
+                    record[key] = nil  -- Remove from root
+                end
+            end
+            
+            -- Add structured metrics
+            if next(metrics) ~= nil then
+                record["metrics"] = metrics
+            end
+            
+            return 1, timestamp, record
+        end
+      call: process_metrics
+
+  outputs:
+    # Application logs output - SAP BTP Cloud Logging JSON mTLS API
+    - name: http
+      match: vllm-app
+      host: ${CLOUD_LOGGING_HOST}
+      port: 443
+      uri: /
+      format: json
+      json_date_key: timestamp
+      json_date_format: iso8601
+      header: Content-Type application/json
+      tls: on
+      tls.verify: on
+      tls.ca_file: /etc/ssl/certs/ca-certificates.crt
+      http_user: ${CLOUD_LOGGING_USER}
+      http_passwd: ${CLOUD_LOGGING_PASSWORD}
+      compress: gzip
+      retry_limit: 3
+
+    # Metrics output - SAP BTP Cloud Logging JSON mTLS API (metric format)
+    - name: http
+      match: vllm-metrics
+      host: ${CLOUD_LOGGING_HOST}
+      port: 443
+      uri: /
+      format: json
+      json_date_key: timestamp
+      json_date_format: iso8601
+      header: Content-Type application/json
+      tls: on
+      tls.verify: on
+      tls.ca_file: /etc/ssl/certs/ca-certificates.crt
+      http_user: ${CLOUD_LOGGING_USER}
+      http_passwd: ${CLOUD_LOGGING_PASSWORD}
+      compress: gzip
+      retry_limit: 3
