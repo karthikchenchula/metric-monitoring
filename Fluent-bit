@@ -67,38 +67,28 @@ pipeline:
       call: process_metrics
 
   outputs:
-    # Application logs output - SAP BTP Cloud Logging JSON mTLS API
+    # Application logs output - Direct to OpenSearch
     - name: http
-      match: vllm-app
-      host: ${CLOUD_LOGGING_HOST}
+      match: "vllm-app"
+      host: ${OPENSEARCH_HOST}
       port: 443
-      uri: /
-      format: json
-      json_date_key: timestamp
-      json_date_format: iso8601
-      header: Content-Type application/json
+      http_user: ${OPENSEARCH_USER}
+      http_passwd: ${OPENSEARCH_PASSWORD}
       tls: on
-      tls.verify: on
-      tls.ca_file: /etc/ssl/certs/ca-certificates.crt
-      http_user: ${CLOUD_LOGGING_USER}
-      http_passwd: ${CLOUD_LOGGING_PASSWORD}
+      tls.verify: off
+      format: json
+      http_method: PUT
+      uri: /
       compress: gzip
-      retry_limit: 3
 
-    # Metrics output - SAP BTP Cloud Logging JSON mTLS API (metric format)
-    - name: http
+    # Metrics output - Direct to OpenSearch (metric format preserved)
+    - name: opensearch
       match: vllm-metrics
-      host: ${CLOUD_LOGGING_HOST}
+      host: ${OPENSEARCH_HOST}
       port: 443
-      uri: /
-      format: json
-      json_date_key: timestamp
-      json_date_format: iso8601
-      header: Content-Type application/json
+      http_user: ${OPENSEARCH_USER}
+      http_passwd: ${OPENSEARCH_PASSWORD}
+      index: metrics-vllm
       tls: on
-      tls.verify: on
-      tls.ca_file: /etc/ssl/certs/ca-certificates.crt
-      http_user: ${CLOUD_LOGGING_USER}
-      http_passwd: ${CLOUD_LOGGING_PASSWORD}
-      compress: gzip
-      retry_limit: 3
+      tls.verify: off
+      suppress_type_name: on
