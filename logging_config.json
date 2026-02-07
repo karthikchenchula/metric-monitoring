@@ -1,30 +1,42 @@
 {
-  "version": 1,
-  "formatters": {
-    "json": {
-      "class": "pythonjsonlogger.jsonlogger.JsonFormatter"
-    }
-  },
-  "handlers": {
-    "local_file": {
-      "class": "logging.handlers.RotatingFileHandler",
-      "filename": "/app/logs/vllm-debug.log",
-      "maxBytes": 104857600,
-      "backupCount": 3,
-      "level": "DEBUG",
-      "formatter": "json"
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "json": {
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "format": "%(message)s",
+            "rename_fields": {
+                "message": "msg"
+            },
+            "timestamp": true,
+            "static_fields": {
+                "logger": "vllm"
+            }
+        }
     },
-    "cloud_file": {
-      "class": "logging.handlers.RotatingFileHandler",
-      "filename": "/app/logs/vllm-errors.log",
-      "maxBytes": 52428800,
-      "backupCount": 5,
-      "level": "WARNING",
-      "formatter": "json"
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "json",
+            "stream": "ext://sys.stdout"
+        },
+        "fileHandler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "json",
+            "filename": "/app/logs/app.log",
+            "maxBytes": 104857600,
+            "backupCount": 10
+        }
+    },
+    "root": {
+        "level": "INFO",
+        "handlers": ["console", "fileHandler"]
+    },
+    "loggers": {
+        "vllm": {
+            "level": "INFO",
+            "handlers": ["console", "fileHandler"],
+            "propagate": false
+        }
     }
-  },
-  "root": {
-    "level": "DEBUG",
-    "handlers": ["local_file", "cloud_file"]
-  }
 }
