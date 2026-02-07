@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "formatters": {
+    "json": {
+      "class": "pythonjsonlogger.jsonlogger.JsonFormatter"
+    }
+  },
+  "handlers": {
+    "local_file": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "filename": "/app/logs/vllm-debug.log",
+      "maxBytes": 104857600,
+      "backupCount": 3,
+      "level": "DEBUG",
+      "formatter": "json"
+    },
+    "cloud_file": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "filename": "/app/logs/vllm-errors.log",
+      "maxBytes": 52428800,
+      "backupCount": 5,
+      "level": "WARNING",
+      "formatter": "json"
+    }
+  },
+  "root": {
+    "level": "DEBUG",
+    "handlers": ["local_file", "cloud_file"]
+  }
+}
