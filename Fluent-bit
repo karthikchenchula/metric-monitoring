@@ -13,15 +13,65 @@ pipeline:
       tag: vllm-app
       parser: json
 
-    # vLLM Prometheus metrics
-    - name: prometheus_scrape
+    # vLLM Prometheus metrics - Using HTTP input (more reliable)
+    - name: http
       host: 127.0.0.1
       port: 8000
+      uri: /metrics
       tag: vllm-metrics
-      metrics_path: /metrics
-      scrape_interval: 10s
+      interval_sec: 10
+      format: none
+      successful_response_code: 200
 
   filters:
+    # Parse Prometheus text format into key-value pairs
+    - name: lua
+      match: vllm-metrics
+      script: |
+        function parse_prometheus(tag, timestamp, record)
+            -- Check if already parsed (has metric keys)
+            for key, _ in pairs(record) do
+                if string.match(key, "^vllm_") or string.match(key, "^python_") or string.match(key, "^process_") then
+                    return 1, timestamp, record
+                end
+            end
+            
+            -- Get raw text from HTTP input (try multiple field names)
+            local raw_text = record["log"] or record["response"] or record["body"] or ""
+            if raw_text == "" then
+                -- Debug: log what fields exist (uncomment for debugging)
+                -- print("Available fields: ", table.concat(record, ", "))
+                return -1, 0, nil
+            end
+            
+            local parsed_metrics = {}
+            
+            -- Parse each line of Prometheus text
+            for line in string.gmatch(raw_text, "[^\r\n]+") do
+                -- Skip comments and empty lines
+                if not string.match(line, "^%s*#") and line ~= "" then
+                    -- Match: metric_name{labels} value OR metric_name value
+                    local metric_name, value = string.match(line, "^([%w_:]+)%{.-%}%s+([%d%.%-eE%+]+)")
+                    if not metric_name then
+                        metric_name, value = string.match(line, "^([%w_:]+)%s+([%d%.%-eE%+]+)")
+                    end
+                    
+                    if metric_name and value then
+                        parsed_metrics[metric_name] = tonumber(value)
+                    end
+                end
+            end
+            
+            -- Return parsed metrics if found
+            if next(parsed_metrics) ~= nil then
+                return 1, timestamp, parsed_metrics
+            end
+            
+            return -1, 0, nil
+        end
+      call: parse_prometheus
+
+
     # Add metadata to application logs
     - name: modify
       match: vllm-app
